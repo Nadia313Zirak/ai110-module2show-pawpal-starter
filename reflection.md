@@ -7,10 +7,28 @@
 - Briefly describe your initial UML design.
 - What classes did you include, and what responsibilities did you assign to each?
 
+ANS: 
+The initial design centers around on three core actions a user has the ability to perform:
+
+1- The system is designed to help a pet owner manage and organize daily pet care tasks.
+
+2- The user should be able to enter basic information about the owner and pet so the system knows who the schedule is for.
+
+
+3- The user should be able to add and manage pet care tasks such as feeding, walks, medication, grooming, and enrichment, including details like duration and priority.
+
+4- The user should be able to generate and view a daily care plan that organizes tasks based on constraints, priorities, and available time, while also explaining why the plan was chosen.
+
 **b. Design changes**
 
 - Did your design change during implementation?
 - If yes, describe at least one change and why you made it.
+**b. Design changes**
+
+Yes, I made a few small design improvements after reviewing my initial skeleton and using AI feedback.
+One change I made was converting the Owner class into a dataclass to keep it consistent with the Pet and Task classes. This made the code cleaner and more uniform.
+I also updated the Scheduler class to accept an optional list of tasks during initialization. This allows the scheduler to directly manage and organize tasks when generating a daily plan. Ialso  modified the PawPalSystem class to allow the owner, pet, tasks, and scheduler to be optional when the system is created. This makes the system more flexible and allows data to be added gradually instead of requiring everything upfront.
+These changes improved the structure and flexibility of the system without changing the overall design.
 
 ---
 

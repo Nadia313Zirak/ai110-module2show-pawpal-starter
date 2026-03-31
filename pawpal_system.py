@@ -8,9 +8,9 @@ class Task:
     task_id: int
     title: str
     description: str
-    duration: int  # in minutes
-    priority: int  # 1-5, where 5 is highest
-    frequency: str  # e.g., "daily", "weekly", "once"
+    duration: int  
+    priority: int 
+    frequency: str  
     task_type: str
     completed: bool = False
 
@@ -56,7 +56,7 @@ class Owner:
     """Dataclass representing a pet owner."""
     owner_id: int
     name: str
-    available_time: int  # in minutes per day
+    available_time: int  
     preferences: str
     pets: List[Pet] = field(default_factory=list)
 
@@ -80,6 +80,7 @@ class Scheduler:
     """Class responsible for scheduling pet care tasks."""
 
     def __init__(self, owner: Owner) -> None:
+        """Initialize scheduler with owner's tasks and available time."""
         self.owner = owner
         self.available_time = owner.available_time
 
