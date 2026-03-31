@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Optional
+from datetime import date, timedelta
 
 
 @dataclass
@@ -8,9 +9,11 @@ class Task:
     task_id: int
     title: str
     description: str
-    duration: int  
-    priority: int 
-    frequency: str  
+    time: str
+    due_date: date
+    duration: int
+    priority: int
+    frequency: str
     task_type: str
     completed: bool = False
 
@@ -56,7 +59,7 @@ class Owner:
     """Dataclass representing a pet owner."""
     owner_id: int
     name: str
-    available_time: int  
+    available_time: int
     preferences: str
     pets: List[Pet] = field(default_factory=list)
 
@@ -89,13 +92,104 @@ class Scheduler:
         return self.owner.get_all_tasks()
 
     def sort_tasks(self) -> List[Task]:
-        """Sort incomplete tasks by priority (highest first) and then by duration."""
+        """Sort incomplete tasks by priority and duration."""
         tasks = [task for task in self.get_all_tasks() if not task.completed]
         return sorted(tasks, key=lambda t: (-t.priority, t.duration))
 
+    def sort_by_time(self) -> List[Task]:
+        """Sort incomplete tasks by due date and time."""
+        tasks = [task for task in self.get_all_tasks() if not task.completed]
+        return sorted(tasks, key=lambda task: (task.due_date, task.time))
+
+    def filter_tasks(
+        self,
+        completed: Optional[bool] = None,
+        pet_name: Optional[str] = None
+    ) -> List[Task]:
+        """Filter tasks by completion status and/or pet name."""
+        filtered_tasks = []
+
+        for pet in self.owner.pets:
+            if pet_name is not None and pet.name.lower() != pet_name.lower():
+                continue
+
+            for task in pet.tasks:
+                if completed is None or task.completed == completed:
+                    filtered_tasks.append(task)
+
+        return filtered_tasks
+
+    def complete_task(self, task_id: int, pet_name: str) -> bool:
+        """Mark a task complete and create the next recurring task if needed."""
+        pet = next((p for p in self.owner.pets if p.name.lower() == pet_name.lower()), None)
+        if pet is None:
+            return False
+
+        task = next((t for t in pet.tasks if t.task_id == task_id), None)
+        if task is None or task.completed:
+            return False
+
+        task.mark_complete()
+
+        if task.frequency.lower() == "daily":
+            next_due_date = task.due_date + timedelta(days=1)
+        elif task.frequency.lower() == "weekly":
+            next_due_date = task.due_date + timedelta(days=7)
+        else:
+            return True
+
+        next_task_id = max((t.task_id for t in self.owner.get_all_tasks()), default=0) + 1
+
+        new_task = Task(
+            task_id=next_task_id,
+            title=task.title,
+            description=task.description,
+            time=task.time,
+            due_date=next_due_date,
+            duration=task.duration,
+            priority=task.priority,
+            frequency=task.frequency,
+            task_type=task.task_type,
+            completed=False
+        )
+
+        pet.add_task(new_task)
+        return True
+
+    def detect_conflicts(self) -> List[str]:
+        """Detect tasks that share the same date and time and return warning messages."""
+        warnings = []
+        scheduled_items = []
+
+        for pet in self.owner.pets:
+            for task in pet.tasks:
+                if not task.completed:
+                    scheduled_items.append((pet.name, task))
+
+        scheduled_items.sort(key=lambda item: (item[1].due_date, item[1].time))
+
+        for i in range(len(scheduled_items)):
+            pet1, task1 = scheduled_items[i]
+            for j in range(i + 1, len(scheduled_items)):
+                pet2, task2 = scheduled_items[j]
+
+                if task1.due_date == task2.due_date and task1.time == task2.time:
+                    warnings.append(
+                        f"Warning: Conflict detected on {task1.due_date} at {task1.time} "
+                        f"between '{task1.title}' for {pet1} and '{task2.title}' for {pet2}."
+                    )
+
+        return warnings
+
     def generate_daily_plan(self) -> List[Task]:
-        """Generate an organized daily plan based on available time and task priorities."""
-        sorted_tasks = self.sort_tasks()
+        """Generate a daily plan for tasks due today within available time."""
+        today = date.today()
+        tasks_due_today = [
+            task for task in self.get_all_tasks()
+            if not task.completed and task.due_date <= today
+        ]
+        sorted_tasks = sorted(tasks_due_today, key=lambda t: (-t.priority, t.time))
+
         daily_plan = []
         total_duration = 0
 
@@ -118,7 +212,8 @@ class Scheduler:
 
         for idx, task in enumerate(daily_plan, 1):
             explanation += (
-                f"{idx}. {task.title} ({task.duration} min) - Priority: {task.priority}\n"
+                f"{idx}. {task.title} on {task.due_date} at {task.time} "
+                f"({task.duration} min) - Priority: {task.priority}\n"
             )
             total_time += task.duration
 

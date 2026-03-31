@@ -43,6 +43,8 @@ These changes improved the structure and flexibility of the system without chang
 
 - Describe one tradeoff your scheduler makes.
 - Why is that tradeoff reasonable for this scenario?
+ANS:
+-One tradeoff my scheduler makes is in the conflict detection logic. Right now, it only checks whether two tasks have the exact same date and time. This is simpler and easier to understand, but it does not detect partial overlaps based on task duration. For example, if one task starts at 8:00 and lasts 30 minutes, and another starts at 8:15, the current version would not flag that as a conflict.I think this tradeoff is reasonable for this project because it keeps the algorithm lightweight, readable, and easier to test. Since PawPal+ is a beginner-friendly scheduling app.
 
 ---
 
