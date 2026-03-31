@@ -74,3 +74,7 @@ The test suite verifies the core functionality of the PawPal+ system, including:
 ⭐⭐⭐⭐☆ (4/5)
 
 I am confident that the system behaves correctly for the main scheduling features and common edge cases. The tests cover sorting, filtering, recurring tasks, and conflict detection. Additional improvements could include testing more complex scheduling scenarios such as overlapping durations or large task sets.
+
+## System Architecture (UML)
+
+![PawPal UML Diagram](images/uml_final.png)
