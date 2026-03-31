@@ -78,3 +78,20 @@ I am confident that the system behaves correctly for the main scheduling feature
 ## System Architecture (UML)
 
 ![PawPal UML Diagram](images/uml_final.png)
+
+## Features
+
+- Add and manage multiple pets
+- Add, edit, and complete pet care tasks
+- Task prioritization based on importance
+- Sorting tasks by date and time
+- Filtering tasks by pet and completion status
+- Daily schedule generation based on available time
+- Recurring tasks (daily and weekly automation)
+- Conflict detection for tasks scheduled at the same time
+- Clear schedule explanation for decision transparency
+
+## 📸 Demo
+Below is a screenshot of the PawPal+ application interface showing task management, scheduling, and conflict detection features.
+
+![PawPal App Demo](images/app_demo.png)
